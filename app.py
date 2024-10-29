@@ -11,7 +11,7 @@ from sklearn.manifold import TSNE
 st.title('Word Prediction')
 
 # select random seed (drop-down)
-seed = st.selectbox('Select the random seed', (1, 2 ,3))
+seed = st.selectbox('Select the random seed', (1, 2, 3))
 
 np.random.seed(seed)
 torch.manual_seed(seed)
@@ -20,7 +20,7 @@ torch.manual_seed(seed)
 emb_dim = st.selectbox('Select the embedding dimension', (32, 64))
 
 # select context length (drop-down)
-block_size = st.selectbox('Select the context length', (2, 6 ,10))
+block_size = st.selectbox('Select the context length', (2, 6, 10))
 
 activation_functions = {"ReLU": 1, "Tanh": 2, "Sigmoid": 3, "Sin": 4}
 
@@ -37,8 +37,8 @@ k = st.slider('Select the number of characters to predict', 1, 100, 1)
 text = st.text_input('Enter the text to predict upon', 'Type here...')
 
 # read data
-with open(r'D:\Users\abhay\Downloads\ML_Classes\ES335-Assignment-3\dataset.txt', 'r', encoding='utf-8') as file:
-    data = file.read()
+data = open('dataset.txt', 'r').read()
+
 # unique characters
 unique_chars = list(set(''.join(data)))
 unique_chars.sort()
@@ -49,19 +49,19 @@ vocab_dict_inv = {ch:i for i, ch in enumerate(unique_chars)}
 
 # model
 class NextChar(nn.Module):
-  def __init__(self, block_size, vocab_size, emb_dim):
-    super().__init__()
-    self.emb = nn.Embedding(vocab_size, emb_dim)
-    self.lin1 = nn.Linear(block_size * emb_dim, 1024)
-    self.lin2 = nn.Linear(1024, vocab_size)
-    self.activation = nn.ReLU()
-
-  def forward(self, x):
-    x = self.emb(x)
-    x = x.view(x.shape[0], -1)
-    x = self.activation(self.lin1(x))
-    x = self.lin2(x)
-    return x
+    def __init__(self, block_size, vocab_size, emb_dim):
+        super().__init__()
+        self.emb = nn.Embedding(vocab_size, emb_dim)
+        self.lin1 = nn.Linear(block_size * emb_dim, 1024)
+        self.lin2 = nn.Linear(1024, vocab_size)
+        self.activation = nn.ReLU()
+    
+    def forward(self, x):
+        x = self.emb(x)
+        x = x.view(x.shape[0], -1)
+        x = self.activation(self.lin1(x))
+        x = self.lin2(x)
+        return x
 
 # create model
 model = NextChar(block_size, len(unique_chars), emb_dim)
